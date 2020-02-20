@@ -34,7 +34,7 @@ provider "google" {
 }
 
 provider "kubernetes" {
-  version                = "1.10.0"
+  #version                = "1.10.0"
   load_config_file       = "false"
   host                   = "https://${data.terraform_remote_state.cluster.outputs.cluster_endpoint}"
   client_certificate     = base64decode(data.terraform_remote_state.cluster.outputs.cluster_master_auth_client_certificate)
