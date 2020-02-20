@@ -1,11 +1,19 @@
-provider "kubernetes" {
-  load_config_file = "false"
+variable "gcp_credentials" {
+  description = "GCP credentials needed by google provider"
+}
 
-  host = "https://${data.terraform_remote_state.cluster.outputs.k8s_endpoint}"
+variable "gcp_region" {
+  description = "GCP region, e.g. us-east1"
+  default     = "us-west1"
+}
 
-  client_certificate     = base64decode(data.terraform_remote_state.cluster.outputs.k8s_master_auth_client_certificate)
-  client_key             = base64decode(data.terraform_remote_state.cluster.outputs.k8s_master_auth_client_key)
-  cluster_ca_certificate = base64decode(data.terraform_remote_state.cluster.outputs.k8s_master_auth_cluster_ca_certificate)
+variable "gcp_zone" {
+  description = "GCP zone, e.g. us-east1-a"
+  default     = "us-west1-b"
+}
+
+variable "gcp_project" {
+  description = "GCP project name"
 }
 
 data "terraform_remote_state" "cluster" {
@@ -14,62 +22,97 @@ data "terraform_remote_state" "cluster" {
   config = {
     organization = "multicloud-provisioning-demo"
     workspaces = {
-      name = "gke-cluster-dev"
+      name = "02-gke-cluster"
     }
   }
 }
 
-resource "kubernetes_namespace" "example" {
+provider "google" {
+  credentials = var.gcp_credentials
+  project     = var.gcp_project
+  region      = var.gcp_region
+}
+
+provider "kubernetes" {
+  version                = "1.10.0"
+  load_config_file       = "false"
+  host                   = "https://${data.terraform_remote_state.cluster.outputs.cluster_endpoint}"
+  client_certificate     = base64decode(data.terraform_remote_state.cluster.outputs.cluster_master_auth_client_certificate)
+  client_key             = base64decode(data.terraform_remote_state.cluster.outputs.cluster_master_auth_client_key)
+  cluster_ca_certificate = base64decode(data.terraform_remote_state.cluster.outputs.cluster_master_auth_cluster_ca_certificate)
+}
+
+resource "kubernetes_namespace" "staging" {
   metadata {
-    name = "my-first-namespace"
+    name = "staging"
   }
 }
 
-resource "kubernetes_pod" "test" {
+resource "google_compute_address" "default" {
+  name   = var.gcp_project
+  region = var.gcp_region
+}
+
+resource "kubernetes_service" "nginx" {
   metadata {
-    name = "terraform-example"
+    namespace = kubernetes_namespace.staging.metadata.0.name
+    name      = "nginx"
   }
 
   spec {
-    container {
-      image = "nginx:1.7.9"
-      name  = "example"
+    selector = {
+      run = "nginx"
+    }
 
-      env {
-        name  = "environment"
-        value = "test"
-      }
+    session_affinity = "ClientIP"
 
-      liveness_probe {
-        http_get {
-          path = "/nginx_status"
-          port = 80
+    port {
+      protocol    = "TCP"
+      port        = 80
+      target_port = 80
+    }
 
-          http_header {
-            name  = "X-Custom-Header"
-            value = "Awesome"
+    type             = "LoadBalancer"
+    load_balancer_ip = google_compute_address.default.address
+  }
+}
+
+resource "kubernetes_replication_controller" "nginx" {
+  metadata {
+    name      = "nginx"
+    namespace = kubernetes_namespace.staging.metadata.0.name
+
+    labels = {
+      run = "nginx"
+    }
+  }
+
+  spec {
+    selector = {
+      run = "nginx"
+    }
+
+    template {
+      container {
+        image = "nginx:latest"
+        name  = "nginx"
+
+        resources {
+          limits {
+            cpu    = "0.5"
+            memory = "512Mi"
+          }
+
+          requests {
+            cpu    = "250m"
+            memory = "50Mi"
           }
         }
-
-        initial_delay_seconds = 3
-        period_seconds        = 3
       }
     }
-
-    dns_config {
-      nameservers = ["1.1.1.1", "8.8.8.8", "9.9.9.9"]
-      searches    = ["example.com"]
-
-      option {
-        name  = "ndots"
-        value = 1
-      }
-
-      option {
-        name = "use-vc"
-      }
-    }
-
-    dns_policy = "None"
   }
+}
+
+output "load-balancer-ip" {
+  value = "${google_compute_address.default.address}"
 }
