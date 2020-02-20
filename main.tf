@@ -78,35 +78,60 @@ resource "kubernetes_service" "nginx" {
   }
 }
 
-resource "kubernetes_replication_controller" "nginx" {
+resource "kubernetes_deployment" "example" {
   metadata {
-    name      = "nginx"
+    name = "nginx"
     namespace = kubernetes_namespace.staging.metadata.0.name
-
     labels = {
-      run = "nginx"
+      test = "nginx"
     }
   }
 
   spec {
-    selector = {
-      run = "nginx"
+    replicas = 3
+
+    selector {
+      match_labels = {
+        test = "nginx"
+      }
     }
 
     template {
-      container {
-        image = "nginx:latest"
-        name  = "nginx"
+      metadata {
+        labels = {
+          test = "nginx"
+        }
+      }
 
-        resources {
-          limits {
-            cpu    = "0.5"
-            memory = "512Mi"
+      spec {
+        container {
+          image = "nginx:latest"
+          name  = "nginx"
+
+          resources {
+            limits {
+              cpu    = "0.5"
+              memory = "512Mi"
+            }
+            requests {
+              cpu    = "250m"
+              memory = "50Mi"
+            }
           }
 
-          requests {
-            cpu    = "250m"
-            memory = "50Mi"
+          liveness_probe {
+            http_get {
+              path = "/nginx_status"
+              port = 80
+
+              http_header {
+                name  = "X-Custom-Header"
+                value = "Awesome"
+              }
+            }
+
+            initial_delay_seconds = 3
+            period_seconds        = 3
           }
         }
       }
