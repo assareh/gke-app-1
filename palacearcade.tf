@@ -1,6 +1,6 @@
 resource "kubernetes_service" "palacearcade" {
   metadata {
-    namespace = data.terraform_remote_state.outputs.cluster_namespace
+    namespace = data.terraform_remote_state.cluster.outputs.cluster_namespace
     name      = "palacearcade"
   }
 
@@ -23,7 +23,7 @@ resource "kubernetes_service" "palacearcade" {
 resource "kubernetes_deployment" "palacearcade" {
   metadata {
     name = "palacearcade"
-    namespace = data.terraform_remote_state.outputs.cluster_namespace
+    namespace = data.terraform_remote_state.cluster.outputs.cluster_namespace
     labels = {
       app = "palacearcade"
     }
