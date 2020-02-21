@@ -17,7 +17,7 @@ resource "kubernetes_service" "palacearcade" {
     }
 
     type             = "LoadBalancer"
-    load_balancer_ip = google_compute_address.default.address
+    load_balancer_ip = google_compute_address.palacearcade.address
   }
 }
 
