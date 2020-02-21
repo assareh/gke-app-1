@@ -116,47 +116,6 @@ resource "kubernetes_deployment" "nginx" {
   }
 }
 
-resource "kubernetes_deployment" "palacearcade" {
-  metadata {
-    name = "palacearcade"
-    namespace = kubernetes_namespace.staging.metadata.0.name
-    labels = {
-      app = "palacearcade"
-    }
-  }
-
-  spec {
-    replicas = 3
-
-    selector {
-      match_labels = {
-        app = "palacearcade"
-      }
-    }
-
-    template {
-      metadata {
-        labels = {
-          app = "palacearcade"
-        }
-      }
-
-      spec {
-        container {
-          image = "scarolan/palacearcade"
-          name  = "palacearcade"
-        }
-      }
-    }
-  }
-
-  provisioner "local-exec" {
-    when    = destroy
-    command = "sleep 10"
-  }
-}
-
-
 output "load-balancer-ip" {
   value = "${google_compute_address.default.address}"
 }
