@@ -109,6 +109,11 @@ resource "kubernetes_deployment" "nginx" {
       }
     }
   }
+
+  provisioner "local-exec" {
+    when    = destroy
+    command = "sleep 10"
+  }
 }
 
 output "load-balancer-ip" {
