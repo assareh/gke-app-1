@@ -62,7 +62,7 @@ resource "kubernetes_deployment" "palacearcade" {
 }
 
 resource "google_compute_address" "palacearcade" {
-  name   = var.gcp_project
+  name   = "${var.gcp_project}-palacearcade"
   region = var.gcp_region
 }
 
