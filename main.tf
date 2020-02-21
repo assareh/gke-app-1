@@ -43,12 +43,6 @@ provider "kubernetes" {
   cluster_ca_certificate = base64decode(data.terraform_remote_state.cluster.outputs.cluster_master_auth_cluster_ca_certificate)
 }
 
-resource "kubernetes_namespace" "staging" {
-  metadata {
-    name = "staging"
-  }
-}
-
 resource "google_compute_address" "default" {
   name   = var.gcp_project
   region = var.gcp_region
@@ -56,7 +50,7 @@ resource "google_compute_address" "default" {
 
 resource "kubernetes_service" "nginx" {
   metadata {
-    namespace = kubernetes_namespace.staging.metadata.0.name
+    namespace = data.terraform_remote_state.outputs.cluster_namespace
     name      = "nginx"
   }
 
@@ -79,7 +73,7 @@ resource "kubernetes_service" "nginx" {
 resource "kubernetes_deployment" "nginx" {
   metadata {
     name = "nginx"
-    namespace = kubernetes_namespace.staging.metadata.0.name
+    namespace = data.terraform_remote_state.outputs.cluster_namespace
     labels = {
       app = "nginx"
     }
