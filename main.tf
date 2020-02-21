@@ -62,7 +62,7 @@ resource "kubernetes_service" "nginx" {
 
   spec {
     selector = {
-      run = "nginx"
+      app = "nginx"
     }
 
     port {
@@ -76,7 +76,7 @@ resource "kubernetes_service" "nginx" {
   }
 }
 
-resource "kubernetes_deployment" "example" {
+resource "kubernetes_deployment" "nginx" {
   metadata {
     name = "nginx"
     namespace = kubernetes_namespace.staging.metadata.0.name
