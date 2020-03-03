@@ -37,7 +37,7 @@ provider "kubernetes" {
   version                = "1.9"
   load_config_file       = "false"
   host                   = "https://${data.terraform_remote_state.cluster.outputs.cluster_endpoint}"
-  token                  = data.terraform_remote_state.cluster.outputs.cluster_access_token
+  token                  = "ya29.c.KpYBwAehLErWGPaZa8GUWIvbtZSkI3XgA5NP9f_2MKDWzNv8J6edTK8NBNcGkMR9Ge4wDeGol3aYExJDsw-8cNj3nJhDqEK4vJNutrneWKbjuZUmI6Jcd8fZS7Uv01ZqRqIfu2R-HrdQ8KDR1YIO-x91TJod29B3wPdjsjC-hPZfpwhdlVodsc3cXZ4VhxWJ5jJK2ateys3T"
 #  client_certificate     = base64decode(data.terraform_remote_state.cluster.outputs.cluster_master_auth_client_certificate)
 #  client_key             = base64decode(data.terraform_remote_state.cluster.outputs.cluster_master_auth_client_key)
   cluster_ca_certificate = base64decode(data.terraform_remote_state.cluster.outputs.cluster_master_auth_cluster_ca_certificate)
