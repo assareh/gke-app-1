@@ -22,7 +22,7 @@ data "terraform_remote_state" "cluster" {
   config = {
     organization = "multicloud-provisioning-demo"
     workspaces = {
-      name = "02-gke-cluster"
+      name = "gke-cluster"
     }
   }
 }
@@ -60,7 +60,7 @@ resource "google_compute_address" "default" {
 
 resource "kubernetes_service" "nginx" {
   metadata {
-    namespace = data.terraform_remote_state.cluster.outputs.cluster_namespace
+    # namespace = data.terraform_remote_state.cluster.outputs.cluster_namespace
     name      = "nginx"
   }
 
@@ -83,7 +83,7 @@ resource "kubernetes_service" "nginx" {
 resource "kubernetes_deployment" "nginx" {
   metadata {
     name = "nginx"
-    namespace = data.terraform_remote_state.cluster.outputs.cluster_namespace
+    # namespace = data.terraform_remote_state.cluster.outputs.cluster_namespace
     labels = {
       app = "nginx"
     }
