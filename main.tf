@@ -34,12 +34,12 @@ provider "google" {
 }
 
 provider "kubernetes" {
-  version                = "1.9.0"
+  version                = "1.10"
   load_config_file       = "false"
   host                   = "https://${data.terraform_remote_state.cluster.outputs.cluster_endpoint}"
   token                  = data.terraform_remote_state.cluster.outputs.cluster_access_token
-  client_certificate     = base64decode(data.terraform_remote_state.cluster.outputs.cluster_master_auth_client_certificate)
-  client_key             = base64decode(data.terraform_remote_state.cluster.outputs.cluster_master_auth_client_key)
+#  client_certificate     = base64decode(data.terraform_remote_state.cluster.outputs.cluster_master_auth_client_certificate)
+#  client_key             = base64decode(data.terraform_remote_state.cluster.outputs.cluster_master_auth_client_key)
   cluster_ca_certificate = base64decode(data.terraform_remote_state.cluster.outputs.cluster_master_auth_cluster_ca_certificate)
 }
 
