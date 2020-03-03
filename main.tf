@@ -22,7 +22,7 @@ data "terraform_remote_state" "cluster" {
   config = {
     organization = "multicloud-provisioning-demo"
     workspaces = {
-      name = "gke-cluster"
+      name = "gke-02-cluster"
     }
   }
 }
