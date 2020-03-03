@@ -34,7 +34,7 @@ provider "google" {
 }
 
 provider "kubernetes" {
-  version                = "1.09"
+  version                = "1.9.0"
   load_config_file       = "false"
   host                   = "https://${data.terraform_remote_state.cluster.outputs.cluster_endpoint}"
   token                  = data.terraform_remote_state.cluster.outputs.cluster_access_token
