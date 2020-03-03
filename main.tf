@@ -43,73 +43,73 @@ provider "kubernetes" {
   cluster_ca_certificate = base64decode(data.terraform_remote_state.cluster.outputs.cluster_master_auth_cluster_ca_certificate)
 }
 
-// resource "google_compute_address" "default" {
-//   name   = var.gcp_project
-//   region = var.gcp_region
-// }
+resource "google_compute_address" "default" {
+  name   = var.gcp_project
+  region = var.gcp_region
+}
 
-// resource "kubernetes_service" "nginx" {
-//   metadata {
-//     namespace = data.terraform_remote_state.cluster.outputs.cluster_namespace
-//     name      = "nginx"
-//   }
+resource "kubernetes_service" "nginx" {
+  metadata {
+    namespace = data.terraform_remote_state.cluster.outputs.cluster_namespace
+    name      = "nginx"
+  }
 
-//   spec {
-//     selector = {
-//       app = "nginx"
-//     }
+  spec {
+    selector = {
+      app = "nginx"
+    }
 
-//     port {
-//       protocol    = "TCP"
-//       port        = 80
-//       target_port = 80
-//     }
+    port {
+      protocol    = "TCP"
+      port        = 80
+      target_port = 80
+    }
 
-//     type             = "LoadBalancer"
-//     load_balancer_ip = google_compute_address.default.address
-//   }
-// }
+    type             = "LoadBalancer"
+    load_balancer_ip = google_compute_address.default.address
+  }
+}
 
-// resource "kubernetes_deployment" "nginx" {
-//   metadata {
-//     name = "nginx"
-//     namespace = data.terraform_remote_state.cluster.outputs.cluster_namespace
-//     labels = {
-//       app = "nginx"
-//     }
-//   }
+resource "kubernetes_deployment" "nginx" {
+  metadata {
+    name = "nginx"
+    namespace = data.terraform_remote_state.cluster.outputs.cluster_namespace
+    labels = {
+      app = "nginx"
+    }
+  }
 
-//   spec {
-//     replicas = 3
+  spec {
+    replicas = 3
 
-//     selector {
-//       match_labels = {
-//         app = "nginx"
-//       }
-//     }
+    selector {
+      match_labels = {
+        app = "nginx"
+      }
+    }
 
-//     template {
-//       metadata {
-//         labels = {
-//           app = "nginx"
-//         }
-//       }
+    template {
+      metadata {
+        labels = {
+          app = "nginx"
+        }
+      }
 
-//       spec {
-//         container {
-//           image = "nginx:1.7.9"
-//           name  = "nginx"
-//         }
-//       }
-//     }
-//   }
+      spec {
+        container {
+          image = "nginx:1.7.9"
+          name  = "nginx"
+        }
+      }
+    }
+  }
 
-//   provisioner "local-exec" {
-//     when    = destroy
-//     command = "sleep 10"
-//   }
-// }
+  provisioner "local-exec" {
+    when    = destroy
+    command = "sleep 10"
+  }
+}
 
-// output "load-balancer-ip" {
-//   value = "${google_compute_address.default.address}"
-// }
+output "load-balancer-ip" {
+  value = "${google_compute_address.default.address}"
+}
